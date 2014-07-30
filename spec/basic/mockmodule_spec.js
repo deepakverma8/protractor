@@ -27,6 +27,7 @@ describe('mock modules', function() {
 
   it('should override services via mock modules', function() {
     browser.addMockModule('moduleA', mockModuleA);
+    browser.doBootstrap('index.html');
 
     browser.get('index.html');
 
@@ -36,6 +37,7 @@ describe('mock modules', function() {
   it('should have the version of the last loaded module', function() {
     browser.addMockModule('moduleA', mockModuleA);
     browser.addMockModule('moduleB', mockModuleB);
+    browser.doBootstrap('index.html');
 
     browser.get('index.html');
 
@@ -51,6 +53,7 @@ describe('mock modules', function() {
     };
 
     browser.addMockModule('moduleA', mockModuleA2);
+    browser.doBootstrap('index.html');
 
     browser.get('index.html');
 
@@ -62,6 +65,7 @@ describe('mock modules', function() {
     browser.addMockModule('moduleB', mockModuleB);
 
     browser.removeMockModule('moduleB');
+    browser.doBootstrap('index.html');
 
     browser.get('index.html');
 
@@ -71,6 +75,7 @@ describe('mock modules', function() {
   it('should be a noop to remove a module which does not exist', function() {
     browser.addMockModule('moduleA', mockModuleA);
     browser.removeMockModule('moduleB');
+    browser.doBootstrap('index.html');
 
     browser.get('index.html');
 
@@ -79,7 +84,8 @@ describe('mock modules', function() {
 
   it('should have the version provided from parameters through Module C', function() {
     browser.addMockModule('moduleC', mockModuleC, '42', 'beta');
-
+    browser.doBootstrap('index.html');
+    
     browser.get('index.html');
 
     expect(element(by.css('[app-version]')).getText()).toEqual('42beta');
@@ -87,7 +93,8 @@ describe('mock modules', function() {
 
   it('should load mock modules after refresh', function() {
     browser.addMockModule('moduleA', mockModuleA);
-
+    browser.doBootstrap('index.html');
+    
     browser.get('index.html');
     expect(element(by.css('[app-version]')).getText()).toEqual('2');
 
@@ -95,25 +102,30 @@ describe('mock modules', function() {
     expect(element(by.css('[app-version]')).getText()).toEqual('2');
   });
 
-  // Back and forward do NOT work at the moment because of an issue
-  // bootstrapping with Angular
-  /*
   it('should load mock modules after navigating back and forward', function() {
-    browser.addMockModule('moduleA', mockModuleA);
+    browser.getCapabilities().then(function(caps) {
+      if (caps.get('browserName') === 'safari') {
+        // Safari can't handle navigation. Ignore this test.
+        return;
+      } else {
+        browser.addMockModule('moduleA', mockModuleA);
+        browser.doBootstrap('index.html');
+        
+        browser.get('index.html');
+        
+        expect(element(by.css('[app-version]')).getText()).toEqual('2');
 
-    browser.get('index.html');
-    expect(element(by.css('[app-version]')).getText()).toEqual('2');
+        browser.get('index.html#/repeater');
+        expect(element(by.css('[app-version]')).getText()).toEqual('2');
 
-    browser.get('index.html#/repeater');
-    expect(element(by.css('[app-version]')).getText()).toEqual('2');
+        browser.navigate().back();
+        expect(element(by.css('[app-version]')).getText()).toEqual('2');
 
-    browser.navigate().back();
-    expect(element(by.css('[app-version]')).getText()).toEqual('2');
-
-    browser.navigate().forward();
-    expect(element(by.css('[app-version]')).getText()).toEqual('2');
+        browser.navigate().forward();
+        expect(element(by.css('[app-version]')).getText()).toEqual('2');
+      }
+    });
   });
-  */
 
   it('should load mock modules after navigating back and forward from link', function() {
     browser.getCapabilities().then(function(caps) {
@@ -122,8 +134,10 @@ describe('mock modules', function() {
         return;
       } else {
         browser.addMockModule('moduleA', mockModuleA);
-
+        browser.doBootstrap('index.html');
+    
         browser.get('index.html');
+
         expect(element(by.css('[app-version]')).getText()).toEqual('2');
 
         element(by.linkText('repeater')).click();
