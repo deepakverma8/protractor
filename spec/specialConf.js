@@ -39,14 +39,4 @@ exports.config = {
     defaultTimeoutInterval: 90000
   },
 
-  onPrepare: function() {
-    start = new Date().getTime();
-  },
-
-  onCleanUp: function(exitCode) {
-    var duration = new Date().getTime() - start;
-    console.log('duration is: ', duration)
-    //expect(duration > 4900 && duration < 6000).toBeTruthy();
-    return 0;
-  },
 };
